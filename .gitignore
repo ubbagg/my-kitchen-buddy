@@ -10,3 +10,4 @@ backend/node_modules
 
 # build files
 frontend/dist
+node_modules
