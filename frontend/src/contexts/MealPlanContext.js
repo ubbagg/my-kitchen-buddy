@@ -30,27 +30,25 @@ export const MealPlanProvider = ({ children }) => {
   }, []);
 
   const fetchMealPlans = useCallback(async (filters = {}) => {
-    setLoadingWithDebounce(true);
-    try {
-      const params = new URLSearchParams();
-      Object.keys(filters).forEach(key => {
-        if (filters[key] !== undefined) params.append(key, filters[key]);
-      });
-      
-      const response = await api.get(`/meal-plans?${params}`);
-      setMealPlans(response.data.mealPlans);
-      
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Fetch meal plans error:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to fetch meal plans'
-      };
-    } finally {
-      setLoadingWithDebounce(false);
-    }
-  }, [setLoadingWithDebounce]);
+  setLoadingWithDebounce(true);
+  try {
+    const params = new URLSearchParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key] !== undefined) params.append(key, filters[key]);
+    });
+    
+    // This should call /api/meal-plans (with api prefix)
+    const response = await api.get(`/meal-plans?${params}`);
+    setMealPlans(response.data.mealPlans);
+    
+    return { success: true, data: response.data };
+  } catch (error) {
+    // ... error handling
+  } finally {
+    setLoadingWithDebounce(false);
+  }
+}, [setLoadingWithDebounce]);
+
 
   const fetchMealPlanById = useCallback(async (id) => {
     // Only show loading for new meal plans or if no current meal plan
