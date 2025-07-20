@@ -6,7 +6,7 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 
 // Get all meal plans for user
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 10, active } = req.query;
     
