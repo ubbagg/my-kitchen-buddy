@@ -106,7 +106,7 @@ app.use('/*path', (req, res) => {
 });
 
 // Handle preflight requests explicitly
-app.options('*', (req, res) => {
+app.options('/*path', (req, res) => {
   res.header('Access-Control-Allow-Origin', 'https://my-kitchen-buddy-hnb7.vercel.app');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
