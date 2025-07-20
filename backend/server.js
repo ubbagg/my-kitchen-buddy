@@ -49,7 +49,7 @@ app.use(async (req, res, next) => {
 // Rest of your middleware and routes...
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.CORS_ORIGIN, 'https://my-kitchen-buddy-hnb7.vercel.app/api']
+    ? [process.env.CORS_ORIGIN, 'https://my-kitchen-buddy-hnb7.vercel.app']
     : 'http://localhost:3000',
   credentials: true
 }));
