@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import api from '../utils/api';
 
 const MealPlanContext = createContext();
@@ -14,10 +14,23 @@ export const useMealPlan = () => {
 export const MealPlanProvider = ({ children }) => {
   const [mealPlans, setMealPlans] = useState([]);
   const [currentMealPlan, setCurrentMealPlan] = useState(null);
-  const [loading, setLoading] = useState(false);
+  
+  // Debounced loading state to prevent flickering
+  const [debouncedLoading, setDebouncedLoading] = useState(false);
 
-  const fetchMealPlans = async (filters = {}) => {
-    setLoading(true);
+  const setLoadingWithDebounce = useCallback((isLoading) => {
+    if (isLoading) {
+      setDebouncedLoading(true);
+    } else {
+      // Small delay to prevent flickering
+      setTimeout(() => {
+        setDebouncedLoading(false);
+      }, 200);
+    }
+  }, []);
+
+  const fetchMealPlans = useCallback(async (filters = {}) => {
+    setLoadingWithDebounce(true);
     try {
       const params = new URLSearchParams();
       Object.keys(filters).forEach(key => {
@@ -35,12 +48,16 @@ export const MealPlanProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to fetch meal plans'
       };
     } finally {
-      setLoading(false);
+      setLoadingWithDebounce(false);
     }
-  };
+  }, [setLoadingWithDebounce]);
 
-  const fetchMealPlanById = async (id) => {
-    setLoading(true);
+  const fetchMealPlanById = useCallback(async (id) => {
+    // Only show loading for new meal plans or if no current meal plan
+    if (!currentMealPlan || currentMealPlan._id !== id) {
+      setLoadingWithDebounce(true);
+    }
+    
     try {
       const response = await api.get(`/meal-plans/${id}`);
       setCurrentMealPlan(response.data);
@@ -53,12 +70,12 @@ export const MealPlanProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to fetch meal plan'
       };
     } finally {
-      setLoading(false);
+      setLoadingWithDebounce(false);
     }
-  };
+  }, [currentMealPlan, setLoadingWithDebounce]);
 
-  const createMealPlan = async (mealPlanData) => {
-    setLoading(true);
+  const createMealPlan = useCallback(async (mealPlanData) => {
+    setLoadingWithDebounce(true);
     try {
       const response = await api.post('/meal-plans', mealPlanData);
       const newMealPlan = response.data.mealPlan;
@@ -74,12 +91,11 @@ export const MealPlanProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to create meal plan'
       };
     } finally {
-      setLoading(false);
+      setLoadingWithDebounce(false);
     }
-  };
+  }, [setLoadingWithDebounce]);
 
-  const updateMealPlan = async (id, updates) => {
-    setLoading(true);
+  const updateMealPlan = useCallback(async (id, updates) => {
     try {
       const response = await api.put(`/meal-plans/${id}`, updates);
       const updatedMealPlan = response.data.mealPlan;
@@ -94,12 +110,10 @@ export const MealPlanProvider = ({ children }) => {
         success: false,
         message: error.response?.data?.message || 'Failed to update meal plan'
       };
-    } finally {
-      setLoading(false);
     }
-  };
+  }, []);
 
-  const deleteMealPlan = async (id) => {
+  const deleteMealPlan = useCallback(async (id) => {
     try {
       await api.delete(`/meal-plans/${id}`);
       
@@ -116,9 +130,9 @@ export const MealPlanProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to delete meal plan'
       };
     }
-  };
+  }, [currentMealPlan]);
 
-  const addMealToDate = async (mealPlanId, date, mealType, recipeId) => {
+  const addMealToDate = useCallback(async (mealPlanId, date, mealType, recipeId) => {
     try {
       const response = await api.put(`/meal-plans/${mealPlanId}/meals`, {
         date,
@@ -137,9 +151,9 @@ export const MealPlanProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to add meal'
       };
     }
-  };
+  }, []);
 
-  const removeMealFromDate = async (mealPlanId, date, mealType, recipeId = null) => {
+  const removeMealFromDate = useCallback(async (mealPlanId, date, mealType, recipeId = null) => {
     try {
       const response = await api.delete(`/meal-plans/${mealPlanId}/meals`, {
         data: { date, mealType, recipeId }
@@ -156,10 +170,10 @@ export const MealPlanProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to remove meal'
       };
     }
-  };
+  }, []);
 
-  const generateShoppingList = async (mealPlanId) => {
-    setLoading(true);
+  const generateShoppingList = useCallback(async (mealPlanId) => {
+    setLoadingWithDebounce(true);
     try {
       const response = await api.post(`/meal-plans/${mealPlanId}/shopping-list`);
       
@@ -171,14 +185,14 @@ export const MealPlanProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to generate shopping list'
       };
     } finally {
-      setLoading(false);
+      setLoadingWithDebounce(false);
     }
-  };
+  }, [setLoadingWithDebounce]);
 
   const value = {
     mealPlans,
     currentMealPlan,
-    loading,
+    loading: debouncedLoading, // Use debounced loading
     fetchMealPlans,
     fetchMealPlanById,
     createMealPlan,

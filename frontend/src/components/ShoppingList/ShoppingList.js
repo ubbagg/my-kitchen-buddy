@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useShoppingList } from '../../contexts/ShoppingListContext';
 import Button from '../Common/Button';
 import Input from '../Common/Input';
@@ -17,22 +17,44 @@ const ShoppingList = () => {
   const [selectedListId, setSelectedListId] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newListName, setNewListName] = useState('');
+  const [initialLoading, setInitialLoading] = useState(true); 
+
+  // Memoize functions
+  const loadShoppingLists = useCallback(async () => {
+    const result = await fetchShoppingLists();
+    if (initialLoading) {
+      setInitialLoading(false); // Set initial loading to false
+    }
+    return result;
+  }, [fetchShoppingLists, initialLoading]);
+
+  const loadShoppingListById = useCallback((id) => {
+    fetchShoppingListById(id);
+  }, [fetchShoppingListById]);
 
   useEffect(() => {
-    fetchShoppingLists();
-  }, []);
+    loadShoppingLists();
+  }, [loadShoppingLists]);
 
   useEffect(() => {
     if (shoppingLists.length > 0 && !selectedListId) {
       setSelectedListId(shoppingLists[0]._id);
     }
-  }, [shoppingLists]);
+  }, [shoppingLists, selectedListId]);
 
   useEffect(() => {
     if (selectedListId) {
-      fetchShoppingListById(selectedListId);
+      loadShoppingListById(selectedListId);
     }
-  }, [selectedListId]);
+  }, [selectedListId, loadShoppingListById]);
+
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   const handleCreateList = async (e) => {
     e.preventDefault();
@@ -59,20 +81,6 @@ const ShoppingList = () => {
         }
       }
     }
-  };
-
-  const getCategoryIcon = (category) => {
-    const icons = {
-      produce: '🥬',
-      meat: '🥩',
-      dairy: '🥛',
-      pantry: '🥫',
-      frozen: '🧊',
-      bakery: '🍞',
-      beverages: '🥤',
-      other: '🛒'
-    };
-    return icons[category] || icons.other;
   };
 
   const formatCurrency = (amount) => {
@@ -336,7 +344,7 @@ const ShoppingListDetail = ({ shoppingList }) => {
   }, {}) || {};
 
   const completedItems = shoppingList.items?.filter(item => item.isCompleted) || [];
-  const pendingItems = shoppingList.items?.filter(item => !item.isCompleted) || [];
+  // const pendingItems = shoppingList.items?.filter(item => !item.isCompleted) || [];
 
   const getCategoryIcon = (category) => {
     const icons = {

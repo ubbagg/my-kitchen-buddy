@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useMealPlan } from '../../contexts/MealPlanContext';
 import { useRecipe } from '../../contexts/RecipeContext';
 import Button from '../Common/Button';
@@ -9,16 +9,39 @@ const MealPlanner = () => {
   const { recipes, fetchRecipes } = useRecipe();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedMealPlan, setSelectedMealPlan] = useState(null);
+  const [initialLoading, setInitialLoading] = useState(true); 
   const [formData, setFormData] = useState({
     name: '',
     startDate: '',
     endDate: ''
   });
 
-  useEffect(() => {
-    fetchMealPlans({ active: true });
+  // Wrap functions in useCallback to prevent infinite re-renders
+  const loadMealPlans = useCallback(async () => {
+    const result = await fetchMealPlans({ active: true });
+    if (initialLoading) {
+      setInitialLoading(false); // Set initial loading to false
+    }
+    return result;
+  }, [fetchMealPlans, initialLoading]);
+
+  const loadRecipes = useCallback(() => {
     fetchRecipes({ limit: 50 });
-  }, []);
+  }, [fetchRecipes]);
+
+  useEffect(() => {
+    loadMealPlans();
+    loadRecipes();
+  }, [loadMealPlans, loadRecipes]);
+
+  // Show initial loading only on first load
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   const generateWeekDates = (startDate, endDate) => {
     const dates = [];
@@ -248,13 +271,6 @@ const MealPlanCalendar = ({ mealPlan, recipes }) => {
     if (result.success) {
       alert('Shopping list generated successfully!');
     }
-  };
-
-  const getMealForDate = (date, mealType) => {
-    const meal = mealPlan.meals?.find(m => 
-      new Date(m.date).toDateString() === new Date(date).toDateString()
-    );
-    return meal ? meal[mealType] : null;
   };
 
   return (

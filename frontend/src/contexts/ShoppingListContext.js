@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import api from '../utils/api';
 
 const ShoppingListContext = createContext();
@@ -14,10 +14,23 @@ export const useShoppingList = () => {
 export const ShoppingListProvider = ({ children }) => {
   const [shoppingLists, setShoppingLists] = useState([]);
   const [currentShoppingList, setCurrentShoppingList] = useState(null);
-  const [loading, setLoading] = useState(false);
+  
+  // Debounced loading state to prevent flickering
+  const [debouncedLoading, setDebouncedLoading] = useState(false);
 
-  const fetchShoppingLists = async (filters = {}) => {
-    setLoading(true);
+  const setLoadingWithDebounce = useCallback((isLoading) => {
+    if (isLoading) {
+      setDebouncedLoading(true);
+    } else {
+      // Small delay to prevent flickering
+      setTimeout(() => {
+        setDebouncedLoading(false);
+      }, 200);
+    }
+  }, []);
+
+  const fetchShoppingLists = useCallback(async (filters = {}) => {
+    setLoadingWithDebounce(true);
     try {
       const params = new URLSearchParams();
       Object.keys(filters).forEach(key => {
@@ -35,12 +48,16 @@ export const ShoppingListProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to fetch shopping lists'
       };
     } finally {
-      setLoading(false);
+      setLoadingWithDebounce(false);
     }
-  };
+  }, [setLoadingWithDebounce]);
 
-  const fetchShoppingListById = async (id) => {
-    setLoading(true);
+  const fetchShoppingListById = useCallback(async (id) => {
+    // Only show loading for new shopping lists or if no current list
+    if (!currentShoppingList || currentShoppingList._id !== id) {
+      setLoadingWithDebounce(true);
+    }
+    
     try {
       const response = await api.get(`/shopping-lists/${id}`);
       setCurrentShoppingList(response.data);
@@ -53,12 +70,12 @@ export const ShoppingListProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to fetch shopping list'
       };
     } finally {
-      setLoading(false);
+      setLoadingWithDebounce(false);
     }
-  };
+  }, [currentShoppingList, setLoadingWithDebounce]);
 
-  const createShoppingList = async (shoppingListData) => {
-    setLoading(true);
+  const createShoppingList = useCallback(async (shoppingListData) => {
+    setLoadingWithDebounce(true);
     try {
       const response = await api.post('/shopping-lists', shoppingListData);
       const newShoppingList = response.data.shoppingList;
@@ -74,11 +91,11 @@ export const ShoppingListProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to create shopping list'
       };
     } finally {
-      setLoading(false);
+      setLoadingWithDebounce(false);
     }
-  };
+  }, [setLoadingWithDebounce]);
 
-  const updateShoppingList = async (id, updates) => {
+  const updateShoppingList = useCallback(async (id, updates) => {
     try {
       const response = await api.put(`/shopping-lists/${id}`, updates);
       const updatedShoppingList = response.data.shoppingList;
@@ -94,9 +111,9 @@ export const ShoppingListProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to update shopping list'
       };
     }
-  };
+  }, []);
 
-  const deleteShoppingList = async (id) => {
+  const deleteShoppingList = useCallback(async (id) => {
     try {
       await api.delete(`/shopping-lists/${id}`);
       
@@ -113,9 +130,9 @@ export const ShoppingListProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to delete shopping list'
       };
     }
-  };
+  }, [currentShoppingList]);
 
-  const addItem = async (shoppingListId, item) => {
+  const addItem = useCallback(async (shoppingListId, item) => {
     try {
       const response = await api.post(`/shopping-lists/${shoppingListId}/items`, item);
       const updatedShoppingList = response.data.shoppingList;
@@ -130,9 +147,9 @@ export const ShoppingListProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to add item'
       };
     }
-  };
+  }, []);
 
-  const updateItem = async (shoppingListId, itemId, updates) => {
+  const updateItem = useCallback(async (shoppingListId, itemId, updates) => {
     try {
       const response = await api.put(`/shopping-lists/${shoppingListId}/items/${itemId}`, updates);
       const updatedShoppingList = response.data.shoppingList;
@@ -147,9 +164,9 @@ export const ShoppingListProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to update item'
       };
     }
-  };
+  }, []);
 
-  const deleteItem = async (shoppingListId, itemId) => {
+  const deleteItem = useCallback(async (shoppingListId, itemId) => {
     try {
       const response = await api.delete(`/shopping-lists/${shoppingListId}/items/${itemId}`);
       const updatedShoppingList = response.data.shoppingList;
@@ -164,9 +181,9 @@ export const ShoppingListProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to delete item'
       };
     }
-  };
+  }, []);
 
-  const toggleItemCompleted = async (shoppingListId, itemId) => {
+  const toggleItemCompleted = useCallback(async (shoppingListId, itemId) => {
     try {
       const response = await api.patch(`/shopping-lists/${shoppingListId}/items/${itemId}/toggle`);
       const updatedShoppingList = response.data.shoppingList;
@@ -181,12 +198,12 @@ export const ShoppingListProvider = ({ children }) => {
         message: error.response?.data?.message || 'Failed to toggle item'
       };
     }
-  };
+  }, []);
 
   const value = {
     shoppingLists,
     currentShoppingList,
-    loading,
+    loading: debouncedLoading, // Use debounced loading
     fetchShoppingLists,
     fetchShoppingListById,
     createShoppingList,

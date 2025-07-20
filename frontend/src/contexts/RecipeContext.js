@@ -13,7 +13,7 @@ export const useRecipe = () => {
 
 export const RecipeProvider = ({ children }) => {
   const [recipes, setRecipes] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [currentRecipe, setCurrentRecipe] = useState(null);
 
   // Debounced loading state to prevent flickering
