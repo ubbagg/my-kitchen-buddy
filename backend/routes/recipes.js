@@ -22,7 +22,7 @@ const upload = multer({
 });
 
 // Get all recipes with filtering
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const { 
       cuisine, 

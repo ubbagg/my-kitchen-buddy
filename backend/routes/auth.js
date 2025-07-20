@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', auth, (req, res) => {
   res.json({ 
     message: 'Authentication API endpoints',
     availableRoutes: [
