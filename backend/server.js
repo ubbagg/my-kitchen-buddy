@@ -4,10 +4,9 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 dotenv.config();
-
 const app = express();
 
-// Improved MongoDB connection for serverless environment
+// Updated MongoDB connection for Vercel serverless
 let isConnected = false;
 
 const connectToDatabase = async () => {
@@ -19,10 +18,8 @@ const connectToDatabase = async () => {
     const db = await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-      bufferCommands: false, // Disable mongoose buffering
-      bufferMaxEntries: 0 // Disable mongoose buffering
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
     });
 
     isConnected = db.connections[0].readyState;
