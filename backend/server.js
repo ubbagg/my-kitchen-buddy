@@ -7,28 +7,46 @@ dotenv.config();
 
 const app = express();
 
-// Improved MongoDB connection for serverless
+// Improved MongoDB connection for serverless environment
 let isConnected = false;
 
 const connectToDatabase = async () => {
-  if (!isConnected) {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-      isConnected = true;
-      console.log('📁 Connected to MongoDB');
-    } catch (error) {
-      console.error('❌ MongoDB connection error:', error);
-      throw error;
-    }
+  if (isConnected) {
+    return;
+  }
+
+  try {
+    const db = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      bufferCommands: false, // Disable mongoose buffering
+      bufferMaxEntries: 0 // Disable mongoose buffering
+    });
+
+    isConnected = db.connections[0].readyState;
+    console.log('📁 Connected to MongoDB');
+  } catch (error) {
+    console.error('❌ MongoDB connection error:', error);
+    throw error;
   }
 };
 
-connectToDatabase().catch(console.error);
+// Middleware to ensure database connection before each request
+app.use(async (req, res, next) => {
+  try {
+    await connectToDatabase();
+    next();
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Database connection error', 
+      error: error.message 
+    });
+  }
+});
 
-// Middleware
+// Rest of your middleware and routes...
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? [process.env.CORS_ORIGIN, 'https://my-kitchen-buddy-hnb7.vercel.app']
@@ -39,7 +57,7 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Routes
+// Your existing routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/recipes', require('./routes/recipes'));
 app.use('/api/meal-plans', require('./routes/mealPlans'));
