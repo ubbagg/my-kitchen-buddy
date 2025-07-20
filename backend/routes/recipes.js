@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const Recipe = require('../models/Recipe');
 const auth = require('../middleware/auth');
-const { generateRecipe, analyzeIngredientImage } = require('../../services/openaiService');
+const { generateRecipe, analyzeIngredientImage } = require('../services/openaiService');
 
 const router = express.Router();
 
