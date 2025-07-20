@@ -52,7 +52,7 @@ app.use(cors({
     ? [process.env.CORS_ORIGIN, 'https://my-kitchen-buddy-hnb7.vercel.app']
     : 'http://localhost:3000',
   credentials: true
-}));
+})); 
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
