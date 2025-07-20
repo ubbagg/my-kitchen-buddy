@@ -8,9 +8,11 @@ dotenv.config();
 const app = express();
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('📁 Connected to MongoDB'))
-  .catch((error) => console.error('❌ MongoDB connection error:', error));
+if (mongoose.connection.readyState === 0) {
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('📁 Connected to MongoDB'))
+    .catch((error) => console.error('❌ MongoDB connection error:', error));
+}
 
 // Middleware
 app.use(cors({
@@ -39,7 +41,28 @@ app.get('/api/health', (req, res) => {
 
 // Root route
 app.get('/', (req, res) => {
-  res.json({ message: 'AI Recipe Generator Backend API' });
+  res.json({ 
+    message: 'AI Recipe Generator Backend API',
+    endpoints: [
+      '/api/auth',
+      '/api/recipes', 
+      '/api/meal-plans',
+      '/api/shopping-lists'
+    ]
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ 
+    message: `Route ${req.originalUrl} not found`,
+    availableRoutes: [
+      '/api/auth',
+      '/api/recipes',
+      '/api/meal-plans', 
+      '/api/shopping-lists'
+    ]
+  });
 });
 
 // Error handling
@@ -52,7 +75,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Export for Vercel
+// Export for Vercel (don't listen in production)
 module.exports = app;
 
 // Only listen in development
