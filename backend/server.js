@@ -8,16 +8,31 @@ dotenv.config();
 const app = express();
 
 // Connect to MongoDB
-if (mongoose.connection.readyState === 0) {
-  mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('📁 Connected to MongoDB'))
-    .catch((error) => console.error('❌ MongoDB connection error:', error));
-}
+let isConnected = false;
+
+const connectToDatabase = async () => {
+  if (!isConnected) {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      isConnected = true;
+      console.log('📁 Connected to MongoDB');
+    } catch (error) {
+      console.error('❌ MongoDB connection error:', error);
+      throw error;
+    }
+  }
+};
+
+connectToDatabase().catch(console.error);
+
 
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.CORS_ORIGIN, 'https://my-kitchen-buddy-hnb7.vercel.app/']
+    ? [process.env.CORS_ORIGIN, 'https://my-kitchen-buddy-hnb7.vercel.app']
     : 'http://localhost:3000',
   credentials: true
 }));
@@ -53,7 +68,7 @@ app.get('/', (req, res) => {
 });
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use('/*path', (req, res) => {
   res.status(404).json({ 
     message: `Route ${req.originalUrl} not found`,
     availableRoutes: [
@@ -64,6 +79,7 @@ app.use('*', (req, res) => {
     ]
   });
 });
+
 
 // Error handling
 app.use((error, req, res, next) => {
