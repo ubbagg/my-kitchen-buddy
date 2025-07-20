@@ -111,7 +111,7 @@ const RecipeGenerator = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             🍳 Generate Your Recipe
           </h1>
-
+          
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column - Ingredient Input */}
             <div>
@@ -127,7 +127,12 @@ const RecipeGenerator = () => {
                     onKeyPress={(e) => e.key === 'Enter' && addIngredient()}
                     className="flex-1"
                   />
-                  <Button onClick={addIngredient} variant="secondary">
+                  <Button
+                    onClick={addIngredient} 
+                    variant="outline"
+                    size="sm"
+                    className="ml-2"
+                  >
                     Add
                   </Button>
                 </div>
@@ -333,10 +338,10 @@ const RecipeGenerator = () => {
             <Button
               onClick={handleGenerate}
               loading={loading}
-              size="lg"
-              className="px-12"
+              size="base"
+              className="max-w-10xl mx-auto px-4 sm:px-6 lg:px-8"
             >
-              {loading ? 'Generating Recipe...' : 'Generate Recipe 🍳'}
+              {loading ? 'Generating Recipe...' : 'Generate Recipe'}
             </Button>
           </div>
         </div>
