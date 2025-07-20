@@ -43,12 +43,27 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Rest of your middleware and routes...
+// Updated CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://my-kitchen-buddy-hnb7.vercel.app',
+  'https://my-kitchen-buddy.vercel.app'
+];
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.CORS_ORIGIN, 'https://my-kitchen-buddy-hnb7.vercel.app']
-    : 'http://localhost:3000',
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
 }));
 
 app.use(express.json({ limit: '10mb' }));
@@ -105,9 +120,12 @@ app.use('/*path', (req, res) => {
   });
 });
 
-// Handle preflight requests explicitly
+// Remove or update the explicit preflight handler
 app.options('/*path', (req, res) => {
-  res.header('Access-Control-Allow-Origin', 'https://my-kitchen-buddy-hnb7.vercel.app');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
