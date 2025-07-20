@@ -2,21 +2,27 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.js",
-      "use": "@vercel/node"
+      "src": "app.js",
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/server.js"
+      "dest": "app.js",
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
     },
     {
       "src": "/(.*)",
-      "dest": "/server.js"
+      "dest": "app.js"
     }
   ],
-  "env": {
-    "NODE_ENV": "production"
+  "functions": {
+    "app.js": {
+      "maxDuration": 30
+    }
   }
 }
