@@ -15,7 +15,7 @@ mongoose.connect(process.env.MONGODB_URI)
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.CORS_ORIGIN, 'https://your-frontend.vercel.app']
+    ? [process.env.CORS_ORIGIN, 'https://my-kitchen-buddy-hnb7.vercel.app/']
     : 'http://localhost:3000',
   credentials: true
 }));
