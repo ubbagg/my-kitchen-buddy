@@ -7,7 +7,7 @@ dotenv.config();
 
 const app = express();
 
-// Connect to MongoDB
+// Improved MongoDB connection for serverless
 let isConnected = false;
 
 const connectToDatabase = async () => {
@@ -27,7 +27,6 @@ const connectToDatabase = async () => {
 };
 
 connectToDatabase().catch(console.error);
-
 
 // Middleware
 app.use(cors({
@@ -50,7 +49,8 @@ app.use('/api/shopping-lists', require('./routes/shoppingLists'));
 app.get('/api/health', (req, res) => {
   res.json({ 
     message: 'AI Recipe Generator API is running!',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
 
@@ -67,7 +67,17 @@ app.get('/', (req, res) => {
   });
 });
 
-// 404 handler
+// Error handling middleware (must come before 404 handler)
+app.use((error, req, res, next) => {
+  console.error('Application Error:', error);
+  res.status(500).json({
+    message: process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : error.message
+  });
+});
+
+// 404 handler - FIXED: Added parameter name after *
 app.use('/*path', (req, res) => {
   res.status(404).json({ 
     message: `Route ${req.originalUrl} not found`,
@@ -80,18 +90,7 @@ app.use('/*path', (req, res) => {
   });
 });
 
-
-// Error handling
-app.use((error, req, res, next) => {
-  console.error('Error:', error);
-  res.status(500).json({
-    message: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
-      : error.message
-  });
-});
-
-// Export for Vercel (don't listen in production)
+// Export for Vercel
 module.exports = app;
 
 // Only listen in development
