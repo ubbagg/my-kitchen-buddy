@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useShoppingList } from '../../contexts/ShoppingListContext';
-import Button from '../Common/Button';
-import Input from '../Common/Input';
+import { useShoppingList } from '../../../contexts/ShoppingListContext';
+import Button from '../../ui/Button';
+import Input from '../../ui/Input';
 
 const ShoppingList = () => {
   const {

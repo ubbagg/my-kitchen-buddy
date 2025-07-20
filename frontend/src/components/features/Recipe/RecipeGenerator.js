@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecipe } from '../../contexts/RecipeContext';
-import { useAuth } from '../../contexts/AuthContext';
-import Button from '../Common/Button';
-import Input from '../Common/Input';
+import { useRecipe } from '../../../contexts/RecipeContext';
+import { useAuth } from '../../../contexts/AuthContext';
+import Button from '../../ui/Button';
+import Input from '../../ui/Input';
 
 const RecipeGenerator = () => {
   const [ingredients, setIngredients] = useState([]);

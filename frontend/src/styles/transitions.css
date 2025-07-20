@@ -1,38 +1,15 @@
-/* Smooth transitions for all interactive elements */
-* {
-  transition-property: opacity, transform, background-color, border-color, color;
-  transition-duration: 150ms;
-  transition-timing-function: ease-in-out;
-}
+/* Minimal transitions for calm interactions */
 
-/* Loading states */
-.loading-enter {
-  opacity: 0;
-}
-
-.loading-enter-active {
-  opacity: 1;
-  transition: opacity 300ms ease-in-out;
-}
-
-.loading-exit {
-  opacity: 1;
-}
-
-.loading-exit-active {
-  opacity: 0;
-  transition: opacity 150ms ease-in-out;
-}
-
-/* Content transitions */
+/* Fade in animation for content */
 .fade-in {
-  animation: fadeIn 300ms ease-in-out;
+  animation: fadeIn 400ms ease-out forwards;
+  opacity: 0;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -40,21 +17,64 @@
   }
 }
 
-/* Prevent flicker on hover states */
-.hover-smooth:hover {
-  transition-duration: 100ms;
+/* Slide in animation for modals and sidebars */
+.slide-in-right {
+  animation: slideInRight 300ms ease-out forwards;
 }
 
-/* Smooth spinner */
-.spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
+@keyframes slideInRight {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateX(20px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scale animation for interactive elements */
+.scale-in {
+  animation: scaleIn 200ms ease-out forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Gentle hover animations */
+.hover-lift {
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Loading shimmer effect */
+.shimmer {
+  background: linear-gradient(90deg, 
+    var(--color-gray-200) 25%, 
+    var(--color-gray-100) 50%, 
+    var(--color-gray-200) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }

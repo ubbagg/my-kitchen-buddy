@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useRecipe } from '../../contexts/RecipeContext';
+import { useRecipe } from '../../../contexts/RecipeContext';
 import RecipeCard from './RecipeCard';
-import Button from '../Common/Button';
-import Input from '../Common/Input';
-import LoadingSpinner from '../Common/LoadingSpinner';
+import Button from '../../ui/Button';
+import Input from '../../ui/Input';
+import LoadingSpinner from '../../ui/LoadingSpinner';
 
 const RecipeList = () => {
   const { recipes, fetchRecipes, loading } = useRecipe();

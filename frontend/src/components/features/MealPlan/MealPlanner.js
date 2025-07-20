@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useMealPlan } from '../../contexts/MealPlanContext';
-import { useRecipe } from '../../contexts/RecipeContext';
-import Button from '../Common/Button';
-import Input from '../Common/Input';
+import { useMealPlan } from '../../../contexts/MealPlanContext';
+import { useRecipe } from '../../../contexts/RecipeContext';
+import Button from '../../ui/Button';
+import Input from '../../ui/Input';
 
 const MealPlanner = () => {
   const { createMealPlan, fetchMealPlans, mealPlans, loading } = useMealPlan();

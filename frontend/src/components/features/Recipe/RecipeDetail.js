@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useRecipe } from '../../contexts/RecipeContext';
-import { useAuth } from '../../contexts/AuthContext';
-import Button from '../Common/Button';
-import LoadingSpinner from '../Common/LoadingSpinner';
+import { useRecipe } from '../../../contexts/RecipeContext';
+import { useAuth } from '../../../contexts/AuthContext';
+import Button from '../../ui/Button';
+import LoadingSpinner from '../../ui/LoadingSpinner';
 
 const RecipeDetail = () => {
   const { id } = useParams();

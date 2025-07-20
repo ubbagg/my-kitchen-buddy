@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from '../Common/Button';
+import Button from '../../ui/Button';
 
 const RecipeCard = ({ recipe, onFavorite }) => {
   const getDifficultyColor = (difficulty) => {

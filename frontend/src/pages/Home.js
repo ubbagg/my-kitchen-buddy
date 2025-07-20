@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import Button from '../components/Common/Button';
+import Button from '../components/ui/Button';
 
 const Home = () => {
   const { isAuthenticated } = useAuth();

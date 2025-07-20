@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import Button from '../components/Common/Button';
+import Button from '../components/ui/Button';
 
 const Dashboard = () => {
   const { user } = useAuth();
