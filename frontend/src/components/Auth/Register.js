@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import Button from '../Common/Button';
 import Input from '../Common/Input';
 
+
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
