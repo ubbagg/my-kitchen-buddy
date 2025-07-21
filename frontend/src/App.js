@@ -7,13 +7,13 @@ import { ShoppingListProvider } from './contexts/ShoppingListContext';
 import Header from './components/Layout/Header';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
-import Login from './components/Auth/Login';
-import Register from './components/Auth/Register';
-import RecipeGenerator from './components/Recipe/RecipeGenerator';
-import RecipeDetail from './components/Recipe/RecipeDetail';
-import RecipeList from './components/Recipe/RecipeList';
-import MealPlanner from './components/MealPlan/MealPlanner';
-import ShoppingList from './components/ShoppingList/ShoppingList';
+import Login from './components/features/Auth/Login';
+import Register from './components/features/Auth/Register';
+import RecipeGenerator from './components/features/Recipe/RecipeGenerator';
+import RecipeDetail from './components/features/Recipe/RecipeDetail';
+import RecipeList from './components/features/Recipe/RecipeList';
+import MealPlanner from './components/features/MealPlan/MealPlanner';
+import ShoppingList from './components/features/ShoppingList/ShoppingList';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
