@@ -8,97 +8,106 @@ import { Button, Card, LoadingSpinner } from '../components/ui';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { recipes, fetchRecipes, loading: recipesLoading } = useRecipe();
+
+  /* recipe / meal-plan / shopping-list data */
+  const { recipes, fetchRecipes } = useRecipe();
   const { mealPlans, fetchMealPlans, loading: mealPlansLoading } = useMealPlan();
   const { shoppingLists, fetchShoppingLists, loading: shoppingListsLoading } = useShoppingList();
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [dataLoaded, setDataLoaded] = useState(false);
 
+  /* local loading state */
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  /* one-time dashboard load */
   useEffect(() => {
-    const loadDashboardData = async () => {
+    (async () => {
       try {
         setInitialLoading(true);
-        
-        // Load all data concurrently
         await Promise.all([
           fetchRecipes({ limit: 6 }),
           fetchMealPlans(),
           fetchShoppingLists()
         ]);
-        
-        setDataLoaded(true);
-      } catch (error) {
-        console.error('Error loading dashboard data:', error);
+      } catch (err) {
+        console.error('Dashboard load error:', err);
       } finally {
         setInitialLoading(false);
       }
-    };
-
-    loadDashboardData();
+    })();
   }, [fetchRecipes, fetchMealPlans, fetchShoppingLists]);
 
   if (initialLoading) {
     return <LoadingSpinner fullScreen message="Loading your kitchen dashboard..." />;
   }
 
-  // Get recent data with proper filtering
-  const recentRecipes = recipes.slice(0, 3);
-  const activeMealPlans = mealPlans
-    .filter(mp => mp && !mp.completed && !mp.isCompleted) // Check both possible property names
+  /* recent / active subsets */
+  const recentRecipes        = recipes.slice(0, 3);
+  const activeMealPlans      = mealPlans
+    .filter(mp => !mp.completed && !mp.isCompleted)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 2);
   const pendingShoppingLists = shoppingLists
-    .filter(sl => sl && !sl.completed && !sl.isCompleted) // Check both possible property names
+    .filter(sl => !sl.completed && !sl.isCompleted)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 2);
-  
+
+  /* reusable quick-action icon */
+  const ActionIcon = ({ path, className='' }) => (
+    <svg className={`w-8 h-8 mx-auto ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+      {path}
+    </svg>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Welcome Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user?.name?.split(' ')[0]}! 
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Ready to create something delicious today?
-          </p>
-        </div>
 
-        {/* Quick Actions - With Attractive Colors */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* greeting */}
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome back, {user?.name?.split(' ')[0]}!
+          </h1>
+          <p className="text-gray-600 text-lg">Ready to create something delicious today?</p>
+        </header>
+
+        {/* quick actions */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
           <Link to="/generate-recipe">
-            <Card hover className="text-center py-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:from-purple-100 hover:to-purple-200">
-              <div className="text-3xl mb-3">👨‍🍳</div>
-              <h3 className="font-semibold text-purple-900 mb-2">Generate Recipe</h3>
+            <Card hover className="text-center py-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+              <ActionIcon path={<path d="M12 3v2m0 4v2m-4 4h8m2 6H6a2 2 0 01-2-2V7a2 2 0 012-2h2m8 0h2a2 2 0 012 2v12a2 2 0 01-2 2z"/>} className="text-purple-600 mb-3" />
+              <h3 className="font-semibold text-purple-900 mb-1">Generate Recipe</h3>
               <p className="text-sm text-purple-700">Create recipes with AI</p>
             </Card>
           </Link>
 
           <Link to="/recipes">
-            <Card hover className="text-center py-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:from-blue-100 hover:to-blue-200">
-              <div className="text-3xl mb-3">👩‍💻</div>
-              <h3 className="font-semibold text-blue-900 mb-2">Browse Recipes</h3>
+            <Card hover className="text-center py-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+              <ActionIcon path={<path d="M4 19.5A2.5 2.5 0 006.5 22h11a2.5 2.5 0 002.5-2.5V6H4v13.5zM3 4h18M8 10h8"/>} className="text-blue-600 mb-3" />
+              <h3 className="font-semibold text-blue-900 mb-1">Browse Recipes</h3>
               <p className="text-sm text-blue-700">Discover new dishes</p>
             </Card>
           </Link>
 
           <Link to="/meal-planner">
-            <Card hover className="text-center py-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:from-green-100 hover:to-green-200">
-              <div className="text-3xl mb-3">📅</div>
-              <h3 className="font-semibold text-green-900 mb-2">Plan Meals</h3>
+            <Card hover className="text-center py-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+              <ActionIcon path={<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>} className="text-green-600 mb-3" />
+              <h3 className="font-semibold text-green-900 mb-1">Plan Meals</h3>
               <p className="text-sm text-green-700">Organize weekly menus</p>
             </Card>
           </Link>
 
           <Link to="/shopping-list">
-            <Card hover className="text-center py-6 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:from-orange-100 hover:to-orange-200">
-              <div className="text-3xl mb-3">🛒</div>
-              <h3 className="font-semibold text-orange-900 mb-2">Shopping Lists</h3>
+            <Card hover className="text-center py-6 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+              <ActionIcon path={<path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 12H6L5 9z"/>} className="text-orange-600 mb-3" />
+              <h3 className="font-semibold text-orange-900 mb-1">Shopping Lists</h3>
               <p className="text-sm text-orange-700">Manage ingredients</p>
             </Card>
           </Link>
-        </div>
+
+        </section>
+
+        
+
 
 
         {/* Dashboard Content */}
