@@ -112,6 +112,14 @@
   --max-width-7xl: 80rem;    /* 1280px */
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 600ms ease-out both;
+}
+
 /* Base styles - Clean reset */
 * {
   box-sizing: border-box;
@@ -197,6 +205,21 @@ button, input, select, textarea, a {
   transition: all var(--transition-fast);
 }
 
+.btn-interactive {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.btn-interactive:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow-md);
+}
+.btn-interactive:active {
+  transform: scale(0.97);
+}
+.btn-interactive:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* Loading states */
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -230,5 +253,18 @@ button, input, select, textarea, a {
     padding: 0 var(--space-3);
   }
 }
+
+.feature-card {
+  border-top: 4px solid transparent;
+  transition: transform 200ms ease, border-color 200ms ease;
+}
+.feature-card:nth-child(1) { border-image: linear-gradient(to right, #6366f1, #a5b4fc) 1; }
+.feature-card:nth-child(2) { border-image: linear-gradient(to right, #10b981, #6ee7b7) 1; }
+.feature-card:nth-child(3) { border-image: linear-gradient(to right, #f59e0b, #fcd34d) 1; }
+.feature-card:hover {
+  transform: translateY(-1px);
+  border-color: currentColor;
+}
+
 
  
