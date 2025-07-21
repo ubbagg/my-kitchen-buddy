@@ -3,7 +3,7 @@
 Transform your cooking experience with the power of AI! Generate personalized recipes from your ingredients, plan your meals, and organize your shopping - all in one beautiful, intuitive platform.
 
 - **A Pinch of AI:** [https://my-kitchen-buddy-hnb7.vercel.app/](https://my-kitchen-buddy-hnb7.vercel.app/)
-  
+
 ## ✨ Features
 
 ### 🤖 **AI-Powered Recipe Generation**

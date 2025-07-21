@@ -265,7 +265,11 @@ const MealPlanner = () => {
           {/* Meal Plan Calendar */}
           <div className="lg:col-span-3">
             {selectedMealPlan ? (
-              <MealPlanCalendar mealPlan={selectedMealPlan} recipes={recipes} />
+              <MealPlanCalendar
+                mealPlan={selectedMealPlan}
+                recipes={recipes}
+                onMealPlanUpdate={setSelectedMealPlan}
+              />
             ) : (
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-12 text-center">
                 <svg className="w-24 h-24 mx-auto text-gray-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,7 +291,7 @@ const MealPlanner = () => {
 };
 
 // Enhanced Meal Plan Calendar Component
-const MealPlanCalendar = ({ mealPlan, recipes }) => {
+const MealPlanCalendar = ({ mealPlan, recipes, onMealPlanUpdate }) => {
   const { addMealToDate, removeMealFromDate, generateShoppingList, loading } = useMealPlan();
   const [showRecipeSelector, setShowRecipeSelector] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -299,7 +303,7 @@ const MealPlanCalendar = ({ mealPlan, recipes }) => {
 
   const handleSelectRecipe = async (recipeId) => {
     if (selectedSlot) {
-      await addMealToDate(
+      const result = await addMealToDate(
         mealPlan._id,
         selectedSlot.date,
         selectedSlot.mealType,
@@ -307,11 +311,17 @@ const MealPlanCalendar = ({ mealPlan, recipes }) => {
       );
       setShowRecipeSelector(false);
       setSelectedSlot(null);
+      if (result.success && onMealPlanUpdate) {
+        onMealPlanUpdate(result.mealPlan);
+      }
     }
   };
 
   const handleRemoveMeal = async (date, mealType, recipeId = null) => {
-    await removeMealFromDate(mealPlan._id, date, mealType, recipeId);
+    const result = await removeMealFromDate(mealPlan._id, date, mealType, recipeId);
+    if (result.success && onMealPlanUpdate) {
+      onMealPlanUpdate(result.mealPlan);
+    }
   };
 
   const handleGenerateShoppingList = async () => {
