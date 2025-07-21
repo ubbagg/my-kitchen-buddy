@@ -2,8 +2,8 @@
 
 Transform your cooking experience with the power of AI! Generate personalized recipes from your ingredients, plan your meals, and organize your shopping - all in one beautiful, intuitive platform.
 
-![A Pinch of AI](https://your-app-domain.vercel.app/og Demo:** [https://my-kitchen-buddy.vercel.app](https://my-kitchen-buddy.vercel.app)
-
+- **A Pinch of AI:** [https://my-kitchen-buddy-hnb7.vercel.app/](https://my-kitchen-buddy-hnb7.vercel.app/)
+  
 ## ✨ Features
 
 ### 🤖 **AI-Powered Recipe Generation**
@@ -179,7 +179,7 @@ We welcome contributions! Please follow these steps:
 
 ## 📞 Support & Contact
 
-- **Website:** [https://my-kitchen-buddy.vercel.app](https://my-kitchen-buddy.vercel.app)
+- **Website:** [https://my-kitchen-buddy-hnb7.vercel.app/](https://my-kitchen-buddy-hnb7.vercel.app/)
 - **Email:** garvgarg1902@gamil.com
 
 
